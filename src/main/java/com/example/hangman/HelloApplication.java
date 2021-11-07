@@ -13,25 +13,59 @@ import java.util.ArrayList;
 import java.util.Random;
 
 public class HelloApplication extends Application {
-    String letter;
     @Override
     public void start(Stage stage){
-        ArrayList<Character> hiddenWord = splitWord(getWord());
         stage.setTitle("Hangman");
-        Label title = new Label("Hangman");
+        ArrayList<Character> hiddenWord = splitWord(getWord());
+        ArrayList<Character> dashedLines = getDashedLines(hiddenWord);
+        Label title = new Label(String.valueOf(dashedLines));//will display hangman
         title.relocate(550, 10);
-        Font wordFont = new Font(200);
+        Font wordFont = new Font(150);
+        Font inputFont = new Font(100);
         title.setFont(wordFont);
 
-        Text check = new Text();
-        check.setText(String.valueOf(hiddenWord.get(1)));
-        HBox hBox1 = new HBox(check);
-        VBox vBox1 = new VBox(hBox1);
+        //make things centered
 
-        Pane pane = new Pane(title, vBox1);
+        TextField input = new TextField();
+        Text text = new Text(String.valueOf(hiddenWord));
+        Text winText = new Text();
+
+        Button submit  = new Button("submit");
+        submit.setPrefSize(100, 50);
+        submit.relocate(550, 700);
+
+        input.relocate(550, 550);
+        input.setFont(inputFont);
+
+        //display dashed lines
+
+        Pane spacer = new Pane();
+        HBox hBox1 = new HBox(spacer, title);
+        HBox hBox2 = new HBox(spacer, input, winText);
+        HBox hBox3 = new HBox(spacer, submit, text);
+        VBox vBox = new VBox(hBox1, hBox2, hBox3);
+        vBox.setSpacing(100);
+
+        Pane pane = new Pane(vBox);
         Scene scene = new Scene(pane, 300 ,400);
         stage.setScene(scene);
         stage.show();
+
+        int strike = 0;
+        submit.setOnAction(e -> {
+            for(char a : input.getText().toCharArray()){
+                for(int i = 0; i < hiddenWord.size(); i++){
+                    if(a == hiddenWord.get(i)){
+                        dashedLines.set(i, hiddenWord.get(i));
+                        title.setText(String.valueOf(dashedLines));
+                        if(!dashedLines.contains('-') /*&& strike < 6*/){
+                            winText.setText("You won");
+                        }
+                    }//else strike++; //strike;
+                }
+            }
+        });
+
     }
     public static ArrayList<Character> splitWord(String word){
         ArrayList<Character> value = new ArrayList<>();
@@ -39,6 +73,13 @@ public class HelloApplication extends Application {
             value.add(word.charAt(i));
         }
         return value;
+    }
+    public static ArrayList<Character> getDashedLines(ArrayList<Character> sample){
+        ArrayList<Character> returnValue = new ArrayList<>();
+        for(int i = 0; i < sample.size(); i++){
+            returnValue.add('-');
+        }
+        return returnValue;
     }
     public static String getWord(){
         String[] words = {"jacket", "panic", "shortage", "peel",
@@ -53,6 +94,7 @@ public class HelloApplication extends Application {
         return words[random.nextInt(words.length)];
     }
 
+    
     public static void main(String[] args) {
         launch();
     }
