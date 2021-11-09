@@ -57,23 +57,25 @@ public class HelloApplication extends Application {
 
         submit.setOnAction(e -> {
             for(char a : input.getText().toCharArray()){
-                for(int i = 0; i < hiddenWord.size(); i++){
-                    if(strikes == 6){
-                        winText.setText("you lose");
-                        //initiate lose
-                    }
-                    else if(a == hiddenWord.get(i)){
-                        dashedLines.set(i, hiddenWord.get(i));
-                        title.setText(String.valueOf(dashedLines));
-                        if(!dashedLines.contains('-')){
-                            winText.setText("You won");
-                            //initiate win
+
+                if(hiddenWord.contains(a)){
+                    for(int i = 0; i < hiddenWord.size(); i++){
+                        if(a == hiddenWord.get(i)){
+                            dashedLines.set(i, hiddenWord.get(i));
+                            title.setText(String.valueOf(dashedLines));
+                            if(!dashedLines.contains('-')){
+                                winText.setText("You won");
+                                //initiate win
+                            }
                         }
                     }
-                    if(!hiddenWord.contains(a)){
-                        strikes++;
-                        strikeCount.setText("strikes:" + String.valueOf(strikes));
-                    }
+                    title.setText(String.valueOf(dashedLines));
+                }else if(strikes == 6){
+                    winText.setText("you lose");
+                    //initiate lose
+                }else{
+                    strikes++;
+                    strikeCount.setText("strikes:" + strikes);
                 }
             }
         });
@@ -95,18 +97,18 @@ public class HelloApplication extends Application {
     }
     public static String getWord(){
         String[] words = {"jacket", "panic", "shortage", "peel",
-            "compliance", "branch", "good", "vain", "strict", "mountain", "pace",
-            "umbrella", "ethics", "mass", "tiptoe", "despair", "prefer", "establish",
-            "peanut", "quest", "jealous", "bell", "disagreement", "swear", "release",
-            "respect", "section", "predict", "harvest", "production", "mobile", "my",
-            "care", "brother", "helpless", "disaster", "grounds", "code", "gossip",
-            "marsh", "survival", "lion", "storm", "revoke", "sniff", "reverse",
-            "bracket", "decay", "boom", "generate"};
+                "compliance", "branch", "good", "vain", "strict", "mountain", "pace",
+                "umbrella", "ethics", "mass", "tiptoe", "despair", "prefer", "establish",
+                "peanut", "quest", "jealous", "bell", "disagreement", "swear", "release",
+                "respect", "section", "predict", "harvest", "production", "mobile", "my",
+                "care", "brother", "helpless", "disaster", "grounds", "code", "gossip",
+                "marsh", "survival", "lion", "storm", "revoke", "sniff", "reverse",
+                "bracket", "decay", "boom", "generate"};
         Random random = new Random();
         return words[random.nextInt(words.length)];
     }
 
-    
+
     public static void main(String[] args) {
         launch();
     }
