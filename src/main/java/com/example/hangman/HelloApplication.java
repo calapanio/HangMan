@@ -13,13 +13,21 @@ import java.util.ArrayList;
 import java.util.Random;
 
 public class HelloApplication extends Application {
+
+
     Integer strikes = 0;
+    ArrayList<Character> hiddenWord = splitWord(getWord());
+    ArrayList<Character> dashedLines = getDashedLines(hiddenWord);
+    Label title = new Label(String.valueOf(dashedLines));
+    TextField input = new TextField();
+    Text winText = new Text();
+
+    Text text = new Text(String.valueOf(hiddenWord));
+
     @Override
     public void start(Stage stage){
         stage.setTitle("Hangman");
-        ArrayList<Character> hiddenWord = splitWord(getWord());
-        ArrayList<Character> dashedLines = getDashedLines(hiddenWord);
-        Label title = new Label(String.valueOf(dashedLines));//will display hangman
+        //will display hangman
         title.relocate(550, 10);
         Font wordFont = new Font(150);
         Font inputFont = new Font(100);
@@ -27,24 +35,20 @@ public class HelloApplication extends Application {
 
         //make things centered
 
-        TextField input = new TextField();
-        Text text = new Text(String.valueOf(hiddenWord));
         Text strikeCount = new Text();
-        Text winText = new Text();
         winText.setFont(wordFont);
         strikeCount.setFont(wordFont);
 
-        Button restart = new Button();
-        Button submit  = new Button("submit");
+        Button submit = new Button("submit");
+        Button onEnter = new Button("reset");
         submit.setPrefSize(100, 50);
         submit.relocate(550, 700);
-        restart.setText("restart");
         input.relocate(550, 550);
         input.setFont(inputFont);
 
 
         Pane spacer = new Pane();
-        HBox hBox1 = new HBox(restart, spacer, title, winText);
+        HBox hBox1 = new HBox(onEnter, spacer, title, winText);
         HBox hBox2 = new HBox(spacer, input);
         HBox hBox3 = new HBox(spacer, submit, text, strikeCount);
         VBox vBox = new VBox(hBox1, hBox2, hBox3);
@@ -79,7 +83,9 @@ public class HelloApplication extends Application {
                 }
             }
         });
-
+        onEnter.setOnAction(e ->{
+            reset();
+        });
     }
     public static ArrayList<Character> splitWord(String word){
         ArrayList<Character> value = new ArrayList<>();
@@ -108,6 +114,16 @@ public class HelloApplication extends Application {
         return words[random.nextInt(words.length)];
     }
 
+    public void reset(){
+        hiddenWord = splitWord(getWord());
+        dashedLines = getDashedLines(hiddenWord);
+        title.setText(String.valueOf(dashedLines));
+        title = new Label(String.valueOf(dashedLines));
+        input.clear();
+        strikes = 0;
+        winText.setText("");
+        text.setText(String.valueOf(hiddenWord));
+    }
 
     public static void main(String[] args) {
         launch();
