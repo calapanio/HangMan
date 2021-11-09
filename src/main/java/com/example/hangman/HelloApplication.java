@@ -10,16 +10,15 @@ import javafx.stage.Stage;
 import javafx.scene.control.*;
 import javafx.scene.layout.Pane;
 import java.util.ArrayList;
-import java.util.Objects;
 import java.util.Random;
 
 public class HelloApplication extends Application {
+    Integer strikes = 0;
     @Override
     public void start(Stage stage){
         stage.setTitle("Hangman");
         ArrayList<Character> hiddenWord = splitWord(getWord());
         ArrayList<Character> dashedLines = getDashedLines(hiddenWord);
-        ArrayList<Button> strikes = new ArrayList<>();
         Label title = new Label(String.valueOf(dashedLines));//will display hangman
         title.relocate(550, 10);
         Font wordFont = new Font(150);
@@ -30,14 +29,11 @@ public class HelloApplication extends Application {
 
         TextField input = new TextField();
         Text text = new Text(String.valueOf(hiddenWord));
+        Text strikeCount = new Text();
         Text winText = new Text();
+        winText.setFont(wordFont);
+        strikeCount.setFont(wordFont);
 
-        Button strike1 = new Button();
-        Button strike2 = new Button();
-        Button strike3 = new Button();
-        Button strike4 = new Button();
-        Button strike5 = new Button();
-        Button strike6 = new Button();
         Button restart = new Button();
         Button submit  = new Button("submit");
         submit.setPrefSize(100, 50);
@@ -46,18 +42,11 @@ public class HelloApplication extends Application {
         input.relocate(550, 550);
         input.setFont(inputFont);
 
-        strikes.add(strike1);
-        strikes.add(strike2);
-        strikes.add(strike3);
-        strikes.add(strike4);
-        strikes.add(strike5);
-        strikes.add(strike6);
 
         Pane spacer = new Pane();
-        HBox hBox1 = new HBox(restart, spacer, title);
-        HBox hBox2 = new HBox(spacer, input, winText);
-        HBox hBox3 = new HBox(spacer, submit, text,
-                strike1, strike2, strike3, strike4, strike5, strike6);
+        HBox hBox1 = new HBox(restart, spacer, title, winText);
+        HBox hBox2 = new HBox(spacer, input);
+        HBox hBox3 = new HBox(spacer, submit, text, strikeCount);
         VBox vBox = new VBox(hBox1, hBox2, hBox3);
         vBox.setSpacing(100);
 
@@ -69,14 +58,21 @@ public class HelloApplication extends Application {
         submit.setOnAction(e -> {
             for(char a : input.getText().toCharArray()){
                 for(int i = 0; i < hiddenWord.size(); i++){
-                    if(a == hiddenWord.get(i)){
+                    if(strikes == 6){
+                        winText.setText("you lose");
+                        //initiate lose
+                    }
+                    else if(a == hiddenWord.get(i)){
                         dashedLines.set(i, hiddenWord.get(i));
                         title.setText(String.valueOf(dashedLines));
-                        if(!dashedLines.contains('-') && !Objects.equals(strikes.get(5).getText(), "X")){
+                        if(!dashedLines.contains('-')){
                             winText.setText("You won");
-                        }else if(Objects.equals(strikes.get(5).getText(), "X")) winText.setText("you lose");
-                    }else{
-                        strikes.get(i).setText("X");
+                            //initiate win
+                        }
+                    }
+                    if(!hiddenWord.contains(a)){
+                        strikes++;
+                        strikeCount.setText("strikes:" + String.valueOf(strikes));
                     }
                 }
             }
