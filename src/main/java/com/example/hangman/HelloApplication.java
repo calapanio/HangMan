@@ -1,8 +1,10 @@
 package com.example.hangman;
 
 import javafx.application.Application;
+import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
@@ -14,78 +16,84 @@ import java.util.Random;
 
 public class HelloApplication extends Application {
 
-
     Integer strikes = 0;
-    ArrayList<Character> hiddenWord = splitWord(getWord());
-    ArrayList<Character> dashedLines = getDashedLines(hiddenWord);
-    Label title = new Label(String.valueOf(dashedLines));
-    TextField input = new TextField();
+    Boolean loop = false;
     Text winText = new Text();
 
-    Text text = new Text(String.valueOf(hiddenWord));
 
     @Override
     public void start(Stage stage){
-        stage.setTitle("Hangman");
-        //will display hangman
-        title.relocate(550, 10);
-        Font wordFont = new Font(150);
-        Font inputFont = new Font(100);
-        title.setFont(wordFont);
+        do{
+            ArrayList<Character> hiddenWord = splitWord(getWord());
+            ArrayList<Character> dashedLines = getDashedLines(hiddenWord);
+            Label title = new Label(String.valueOf(dashedLines));
+            TextField input = new TextField();
 
-        //make things centered
+            Text text = new Text(String.valueOf(hiddenWord));
+            stage.setTitle("Hangman");
+            StackPane stackPane = new StackPane();
+            stackPane.getChildren().addAll(title);
+            StackPane.setAlignment(title, Pos.CENTER);
 
-        Text strikeCount = new Text();
-        winText.setFont(wordFont);
-        strikeCount.setFont(wordFont);
+            //will display hangman
+            title.relocate(550, 10);
+            Font wordFont = new Font(150);
+            Font inputFont = new Font(100);
+            title.setFont(wordFont);
 
-        Button submit = new Button("submit");
-        Button onEnter = new Button("reset");
-        submit.setPrefSize(100, 50);
-        submit.relocate(550, 700);
-        input.relocate(550, 550);
-        input.setFont(inputFont);
+            //make things centered
+
+            Text strikeCount = new Text();
+            winText.setFont(wordFont);
+            strikeCount.setFont(wordFont);
+
+            Button submit = new Button("submit");
+            Button onEnter = new Button("reset");
+            submit.setPrefSize(100, 50);
+            submit.relocate(550, 700);
+            input.relocate(550, 550);
+            input.setFont(inputFont);
 
 
-        Pane spacer = new Pane();
-        HBox hBox1 = new HBox(onEnter, spacer, title, winText);
-        HBox hBox2 = new HBox(spacer, input);
-        HBox hBox3 = new HBox(spacer, submit, text, strikeCount);
-        VBox vBox = new VBox(hBox1, hBox2, hBox3);
-        vBox.setSpacing(100);
+            Pane spacer = new Pane();
+            HBox hBox1 = new HBox(onEnter, spacer, stackPane, winText);
+            HBox hBox2 = new HBox(spacer, input);////
+            HBox hBox3 = new HBox(spacer, submit, text, strikeCount);
+            VBox vBox = new VBox(hBox1, hBox2, hBox3);
+            vBox.setSpacing(100);
 
-        Pane pane = new Pane(vBox);
-        Scene scene = new Scene(pane, 300 ,400);
-        stage.setScene(scene);
-        stage.show();
+            Pane pane = new Pane(vBox);
+            Scene scene = new Scene(pane, 300 ,400);
+            stage.setScene(scene);
+            stage.show();
 
-        submit.setOnAction(e -> {
-            for(char a : input.getText().toCharArray()){
+            submit.setOnAction(e -> {
+                for(char a : input.getText().toCharArray()){
 
-                if(hiddenWord.contains(a)){
-                    for(int i = 0; i < hiddenWord.size(); i++){
-                        if(a == hiddenWord.get(i)){
-                            dashedLines.set(i, hiddenWord.get(i));
-                            title.setText(String.valueOf(dashedLines));
-                            if(!dashedLines.contains('-')){
-                                winText.setText("You won");
-                                //initiate win
+                    if(hiddenWord.contains(a)){
+                        for(int i = 0; i < hiddenWord.size(); i++){
+                            if(a == hiddenWord.get(i)){
+                                dashedLines.set(i, hiddenWord.get(i));
+                                title.setText(String.valueOf(dashedLines));
+                                if(!dashedLines.contains('-')){
+                                    winText.setText("You won");
+                                    //initiate win
+                                }
                             }
                         }
+                        title.setText(String.valueOf(dashedLines));
+                    }else if(strikes == 6){
+                        winText.setText("you lose");
+                        //initiate lose
+                    }else{
+                        strikes++;
+                        strikeCount.setText("strikes:" + strikes);
                     }
-                    title.setText(String.valueOf(dashedLines));
-                }else if(strikes == 6){
-                    winText.setText("you lose");
-                    //initiate lose
-                }else{
-                    strikes++;
-                    strikeCount.setText("strikes:" + strikes);
                 }
-            }
-        });
-        onEnter.setOnAction(e ->{
-            reset();
-        });
+                input.clear();
+            });
+            onEnter.setOnAction(e -> reset());
+        }while(loop);
     }
     public static ArrayList<Character> splitWord(String word){
         ArrayList<Character> value = new ArrayList<>();
@@ -103,10 +111,10 @@ public class HelloApplication extends Application {
     }
     public static String getWord(){
         String[] words = {"jacket", "panic", "shortage", "peel",
-                "compliance", "branch", "good", "vain", "strict", "mountain", "pace",
+                "branch", "good", "vain", "strict", "mountain", "pace",
                 "umbrella", "ethics", "mass", "tiptoe", "despair", "prefer", "establish",
-                "peanut", "quest", "jealous", "bell", "disagreement", "swear", "release",
-                "respect", "section", "predict", "harvest", "production", "mobile", "my",
+                "peanut", "quest", "jealous", "bell", "swear", "release",
+                "respect", "section", "predict", "harvest", "mobile", "my",
                 "care", "brother", "helpless", "disaster", "grounds", "code", "gossip",
                 "marsh", "survival", "lion", "storm", "revoke", "sniff", "reverse",
                 "bracket", "decay", "boom", "generate"};
@@ -115,14 +123,15 @@ public class HelloApplication extends Application {
     }
 
     public void reset(){
-        hiddenWord = splitWord(getWord());
-        dashedLines = getDashedLines(hiddenWord);
-        title.setText(String.valueOf(dashedLines));
-        title = new Label(String.valueOf(dashedLines));
-        input.clear();
+        //hiddenWord = splitWord(getWord());
+        //dashedLines = getDashedLines(hiddenWord);
+        //title.setText(String.valueOf(dashedLines));
+        //title = new Label(String.valueOf(dashedLines));
+        //input.clear();
         strikes = 0;
         winText.setText("");
-        text.setText(String.valueOf(hiddenWord));
+        loop = true;
+
     }
 
     public static void main(String[] args) {
